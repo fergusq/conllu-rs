@@ -17,7 +17,7 @@ pub struct Word {
     misc: HashMap<String, String>
 }
 
-pub fn parse_conllu(lines: impl Iterator<Item=&'static str>) -> Vec<Vec<Word>> {
+pub fn parse_conllu(lines: impl Iterator<Item=String>) -> Vec<Vec<Word>> {
     let mut ans = Vec::new();
     for line in lines {
         if line.starts_with("#") { continue; }
@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let parsed = crate::parse_conllu(TEST_DATA.split('\n'));
+        let parsed = crate::parse_conllu(TEST_DATA.split('\n').map(String::from));
         //println!("{:?}", parsed);
         assert_eq!(parsed.len(), 2);
         assert_eq!(parsed[0].len(), 6);
