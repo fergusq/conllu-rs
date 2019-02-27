@@ -5,16 +5,16 @@ use std::fmt::Debug;
 
 #[derive(Debug, Clone)]
 pub struct Word {
-    id: usize,
-    form: String,
-    lemma: String,
-    upos: String,
-    xpos: String,
-    feats: HashMap<String, String>,
-    head: usize,
-    deprel: String,
-    deps: HashMap<usize, String>,
-    misc: HashMap<String, String>
+    pub id: usize,
+    pub form: String,
+    pub lemma: String,
+    pub upos: String,
+    pub xpos: String,
+    pub feats: HashMap<String, String>,
+    pub head: usize,
+    pub deprel: String,
+    pub deps: HashMap<usize, String>,
+    pub misc: HashMap<String, String>
 }
 
 pub fn parse_conllu(lines: impl Iterator<Item=String>) -> Vec<Vec<Word>> {
