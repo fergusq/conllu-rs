@@ -1,20 +1,21 @@
-use std::collections::HashMap;
-use std::hash::Hash;
 use std::str::FromStr;
 use std::fmt::Debug;
+use tendril::Tendril;
+use tendril::fmt::UTF8;
+use tendril::SliceExt;
 
 #[derive(Debug, Clone)]
 pub struct Word {
     pub id: usize,
-    pub form: String,
-    pub lemma: String,
-    pub upos: String,
-    pub xpos: String,
-    pub feats: HashMap<String, String>,
+    pub form: Tendril<UTF8>,
+    pub lemma: Tendril<UTF8>,
+    pub upos: Tendril<UTF8>,
+    pub xpos: Tendril<UTF8>,
+    pub feats: Vec<(Tendril<UTF8>, Tendril<UTF8>)>,
     pub head: usize,
-    pub deprel: String,
-    pub deps: HashMap<usize, String>,
-    pub misc: HashMap<String, String>
+    pub deprel: Tendril<UTF8>,
+    pub deps: Vec<(usize, Tendril<UTF8>)>,
+    pub misc: Vec<(Tendril<UTF8>, Tendril<UTF8>)>
 }
 
 pub fn parse_conllu(lines: impl Iterator<Item=String>) -> Vec<Vec<Word>> {
@@ -29,13 +30,13 @@ pub fn parse_conllu(lines: impl Iterator<Item=String>) -> Vec<Vec<Word>> {
         }
         ans.last_mut().unwrap().push(Word {
             id: id,
-            form: fields[1].to_string(),
-            lemma: fields[2].to_string(),
-            upos: fields[3].to_string(),
-            xpos: fields[4].to_string(),
+            form: fields[1].to_tendril(),
+            lemma: fields[2].to_tendril(),
+            upos: fields[3].to_tendril(),
+            xpos: fields[4].to_tendril(),
             feats: parse_attrs(fields[5], '='),
             head: fields[6].parse().unwrap_or(0),
-            deprel: fields[7].to_string(),
+            deprel: fields[7].to_tendril(),
             deps: parse_attrs(fields[8], ':'),
             misc: parse_attrs(fields[9], '=')
         });
@@ -43,19 +44,18 @@ pub fn parse_conllu(lines: impl Iterator<Item=String>) -> Vec<Vec<Word>> {
     ans
 }
 
-fn parse_attrs<T>(text: &str, sep: char) -> HashMap<T, String>
+fn parse_attrs<T>(text: &str, sep: char) -> Vec<(T, Tendril<UTF8>)>
 where
     T: Eq,
-    T: Hash,
     T: FromStr,
     <T as std::str::FromStr>::Err: Debug
 {
-    let mut ans = HashMap::new();
+    let mut ans = Vec::new();
     if text == "_" { return ans; }
     for item in text.split('|') {
         let pair: Vec<&str> = item.split(sep).collect();
         if pair.len() != 2 { continue; }
-        ans.insert(pair[0].parse().unwrap(), pair[1].to_string());
+        ans.push((pair[0].parse().unwrap(), pair[1].to_tendril()));
     }
     ans
 }

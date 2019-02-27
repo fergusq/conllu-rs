@@ -1,7 +1,8 @@
 [package]
 name = "conllu-rs"
-version = "0.2.1"
+version = "0.2.5"
 authors = ["Iikka Hauhio <iikka.hauhio@helsinki.fi>"]
 edition = "2018"
 
 [dependencies]
+tendril = "*"
